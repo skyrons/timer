@@ -13,7 +13,7 @@ export function App() {
         <Button/>
         <Button/>
 
-        <GlobalStyle/>
+        <GlobalStyle />
     </ThemeProvider>
    
   )
