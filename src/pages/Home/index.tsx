@@ -2,7 +2,7 @@ import { HandPalm, Play } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
-import { act, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { differenceInSeconds } from 'date-fns'
 
 import { 
@@ -20,7 +20,7 @@ const newCycleFormValidationSchema = zod.object({
     task: zod.string().min(1, 'Informe a tarefa'),
     minutesAmount: zod
         .number()
-        .min(5, 'Minutes must be greater than five.')
+        .min(1, 'Minutes must be greater than five.')
         .max(60, 'Minutes must be less than 60.'),
 })
 
@@ -32,6 +32,7 @@ interface Cycle {
     minutesAmount: number
     startDate: Date
     interruptDate?: Date
+    finishedDate?: Date
 }
 
 export function Home (){
@@ -50,20 +51,48 @@ export function Home (){
 
     const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
+    const totalSeconds =  activeCycle ? activeCycle.minutesAmount * 60 : 0 
+    const currentSeconds = activeCycle ? totalSeconds - amountSecondsPased : 0
+
+    const minutesAmount = Math.floor(currentSeconds/60)
+    const secondsAmount = currentSeconds % 60
+
+    const minutes = String(minutesAmount).padStart(2, '0')
+    const seconds = String(secondsAmount).padStart(2, '0')
+
     useEffect(() => {
         let interval: number;
+
         if(activeCycle){
             interval = setInterval(() =>{
-                setAmountSecondsPased(
-                    differenceInSeconds( new Date(), activeCycle.startDate)
+                const secondsDifference = differenceInSeconds( 
+                    new Date(), activeCycle.startDate    
                 )
+
+                if (secondsDifference >= totalSeconds) {
+                    setCycles( (state) =>
+                        state.map(cycle => {
+                            if (cycle.id === activeCycleId){
+                                return {...cycle, finishedDate: new Date()}
+                            } else {
+                                return cycle
+                            }
+                        }),
+                    )
+                    setAmountSecondsPased(totalSeconds)
+                    clearInterval(interval);
+                    
+                } else{
+                    setAmountSecondsPased(secondsDifference)
+                }
+
             }, 1000)
         }
 
         return () => {
             clearInterval(interval)
         }
-    }, [activeCycle])
+    }, [activeCycle, totalSeconds, activeCycleId])
 
     function handleCreateNewCycle(data: NewCycleFormData) {
         
@@ -82,8 +111,8 @@ export function Home (){
     }
 
     function handleInterruptCycle(){
-        setCycles(
-            cycles.map(cycle => {
+        setCycles( (state) =>
+            state.map(cycle => {
                 if (cycle.id === activeCycleId){
                     return {...cycle, interruptDate: new Date()}
                 } else {
@@ -94,16 +123,6 @@ export function Home (){
         setActiveCycleId(null);
     }
 
-    console.log(cycles)
-
-    const totalSeconds =  activeCycle ? activeCycle.minutesAmount * 60 : 0 
-    const currentSeconds = activeCycle ? totalSeconds - amountSecondsPased : 0
-
-    const minutesAmount = Math.floor(currentSeconds/60)
-    const secondsAmount = currentSeconds % 60
-
-    const minutes = String(minutesAmount).padStart(2, '0')
-    const seconds = String(secondsAmount).padStart(2, '0')
 
     useEffect(() => {
         if(activeCycle){
@@ -140,7 +159,7 @@ export function Home (){
                         placeholder="00"
 
                         step="5"
-                        min={5}
+                        min={1}
                         max={60}
                         {...register('minutesAmount', {valueAsNumber: true})}
 
