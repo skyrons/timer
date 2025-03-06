@@ -10,60 +10,43 @@ export function History (){
         <HistoryContainer>
             <h1>Meu Histórico</h1>
 
-            <pre>
-                {JSON.stringify(cycles, null, 2)}
-            </pre>
-
             <HistoryList>
                 <table>
                     <thead>
-                        <th>Tarefa</th>
-                        <th>Duração</th>
-                        <th>Início</th>
-                        <th>Status</th>
+                        <tr>
+                            <th>Tarefa</th>
+                            <th>Duração</th>
+                            <th>Início</th>
+                            <th>Status</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Nome da tarefa</td>
-                            <td>25 minutos</td>
-                            <td>Há cerca de 2 meses</td>
-                            <td>
-                                <Status statusColor="green">
-                                    Concluído
-                                </Status>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Nome da tarefa</td>
-                            <td>25 minutos</td>
-                            <td>Há cerca de 2 meses</td>
-                            <td>
-                                <Status statusColor="yellow">
-                                    Em andamento
-                                </Status>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Nome da tarefa</td>
-                            <td>25 minutos</td>
-                            <td>Há cerca de 2 meses</td>
-                            <td>
-                                <Status statusColor="green">
-                                    Concluído
-                                </Status>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Nome da tarefa</td>
-                            <td>25 minutos</td>
-                            <td>Há cerca de 2 meses</td>
-                            <td>
-                                <Status statusColor="red">
-                                    Interrompido
-                                </Status>
-                            </td>
-                        </tr>
-                        
+                        {cycles.map(cycle => {
+                            return (
+                                <tr key={cycle.id}>
+                                    <td>{cycle.task}</td>
+                                    <td>{cycle.minutesAmount}</td>
+                                    <td>{cycle.startDate.toISOString()}</td>
+                                    <td>
+                                        {cycle.finishedDate && (
+                                            <Status statusColor="green">Concluído</Status>
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        {cycle.interruptDate && (
+                                            <Status statusColor="red">Interrompido</Status>
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        {(!cycle.finishedDate && !cycle.interruptDate) && (
+                                            <Status statusColor="yellow">Em Andamento</Status>
+                                        )}
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </HistoryList>
