@@ -1,6 +1,7 @@
-import { useContext } from "react";
-import { HistoryContainer, HistoryList, Status } from "./styles";
-import { CyclesContext } from "../../contexts/CyclesContext";
+import { useContext } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { HistoryContainer, HistoryList, Status } from './styles';
+import { CyclesContext } from '../../contexts/CyclesContext';
 
 export function History (){
 
@@ -21,25 +22,23 @@ export function History (){
                         </tr>
                     </thead>
                     <tbody>
-                        {cycles.map(cycle => {
+                        {cycles.map((cycle) => {
                             return (
                                 <tr key={cycle.id}>
                                     <td>{cycle.task}</td>
                                     <td>{cycle.minutesAmount}</td>
-                                    <td>{cycle.startDate.toISOString()}</td>
+                                    <td>{ formatDistanceToNow(cycle.startDate, {
+                                        addSuffix: true
+                                    })}</td>
                                     <td>
                                         {cycle.finishedDate && (
                                             <Status statusColor="green">Concluído</Status>
                                         )}
-                                    </td>
-
-                                    <td>
+                                    
                                         {cycle.interruptDate && (
                                             <Status statusColor="red">Interrompido</Status>
                                         )}
-                                    </td>
-
-                                    <td>
+                                    
                                         {(!cycle.finishedDate && !cycle.interruptDate) && (
                                             <Status statusColor="yellow">Em Andamento</Status>
                                         )}
